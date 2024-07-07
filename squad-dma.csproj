@@ -48,6 +48,7 @@
 
 	<ItemGroup>
 	  <Folder Include="Icons\" />
+	  <Folder Include="KmBoxNet\" />
 	  <Folder Include="Resources\" />
 	</ItemGroup>
 
