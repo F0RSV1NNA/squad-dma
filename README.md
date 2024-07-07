@@ -2,7 +2,9 @@
 # Squad-DMA-Radar
 
 ## Description
-Squad DMA Radar is a radar tool for Squad that provides real-time tracking of players/vehicles/deployables on a 2D map.
+Squad DMA Radar is a radar tool for Squad that provides real-time tracking of players/vehicles/deployables on a 2D map. \
+open directory in terminal and paste : Get-ChildItem | Unblock-File
+
 
 ## Usage
 1. Clone the repository.
