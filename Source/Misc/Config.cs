@@ -1,5 +1,8 @@
-﻿using System.Text.Json.Serialization;
+﻿using System;
+using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Collections.Generic;
 
 namespace squad_dma
 {
@@ -41,6 +44,16 @@ namespace squad_dma
 
         [JsonPropertyName("vsync")]
         public bool VSync { get; set; }
+
+        // Adding KMBox properties
+        [JsonPropertyName("kmboxIp")]
+        public string KmboxIp { get; set; }
+
+        [JsonPropertyName("kmboxPort")]
+        public string KmboxPort { get; set; }
+
+        [JsonPropertyName("kmboxMac")]
+        public string KmboxMac { get; set; }
         #endregion
 
         #region Json Ignore
@@ -54,13 +67,13 @@ namespace squad_dma
         };
 
         [JsonIgnore]
-        private static readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions()
+        private static readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions
         {
             WriteIndented = true
         };
 
         [JsonIgnore]
-        private static readonly object _lock = new();
+        private static readonly object _lock = new object();
 
         [JsonIgnore]
         private const string SettingsDirectory = "Configuration\\";
@@ -68,6 +81,7 @@ namespace squad_dma
 
         public Config()
         {
+            // Initialize default values for all settings, including KMBox
             AimviewEnabled = false;
             DefaultZoom = 100;
             EnemyCount = false;
@@ -80,13 +94,11 @@ namespace squad_dma
             UIScale = 100;
             ZoomSensitivity = 25;
             VSync = false;
+            KmboxIp = "1.1.1.1";
+            KmboxPort = "8888";
+            KmboxMac = "123456";
         }
 
-        /// <summary>
-        /// Attempt to load Config.json
-        /// </summary>
-        /// <param name="config">'Config' instance to populate.</param>
-        /// <returns></returns>
         public static bool TryLoadConfig(out Config config)
         {
             lock (_lock)
@@ -96,11 +108,11 @@ namespace squad_dma
 
                 try
                 {
-                    if (!File.Exists($"{SettingsDirectory}Settings.json"))
+                    string filePath = $"{SettingsDirectory}Settings.json";
+                    if (!File.Exists(filePath))
                         throw new FileNotFoundException("Settings.json does not exist!");
 
-                    var json = File.ReadAllText($"{SettingsDirectory}Settings.json");
-
+                    var json = File.ReadAllText(filePath);
                     config = JsonSerializer.Deserialize<Config>(json);
                     return true;
                 }
@@ -112,10 +124,7 @@ namespace squad_dma
                 }
             }
         }
-        /// <summary>
-        /// Save to Config.json
-        /// </summary>
-        /// <param name="config">'Config' instance</param>
+
         public static void SaveConfig(Config config)
         {
             lock (_lock)
@@ -123,8 +132,9 @@ namespace squad_dma
                 if (!Directory.Exists(SettingsDirectory))
                     Directory.CreateDirectory(SettingsDirectory);
 
+                string filePath = $"{SettingsDirectory}Settings.json";
                 var json = JsonSerializer.Serialize<Config>(config, _jsonOptions);
-                File.WriteAllText($"{SettingsDirectory}Settings.json", json);
+                File.WriteAllText(filePath, json);
             }
         }
     }
